@@ -142,7 +142,15 @@ class ItemView extends View {
 }
 
 abstract class SimpleLayout extends RelativeLayout {
-    protected ArrayList<View> viewList = new ArrayList<>();
+    static protected class InnerLayoutParams {
+        int itemCnt;
+        int margin;
+        int itemWidth;
+        int itemHeight;
+    }
+
+    protected final InnerLayoutParams innerLayoutParams = new InnerLayoutParams();
+    protected final ArrayList<View> viewList = new ArrayList<>();
     protected boolean needRefresh = true;
 
     public SimpleLayout(Context context, AttributeSet attrs) {
@@ -175,16 +183,123 @@ abstract class SimpleLayout extends RelativeLayout {
                 removeView(view);
             }
 
+            calculateInnerLayoutParams();
             for (int i = 0; i < viewList.size(); i++) {
                 addView(viewList.get(i), getLayoutParams(i));
             }
         }
     }
 
+    protected abstract void calculateInnerLayoutParams();
     protected abstract LayoutParams getLayoutParams(int viewIndex);
 }
 
-class CategoryBar extends SimpleLayout {
+abstract class HorizontalLayout extends SimpleLayout {
+//    private int maxScrollOffset;
+
+    public HorizontalLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    protected void calculateInnerLayoutParams() {
+        int maxCnt = getMaxItemCntToShow();
+
+        innerLayoutParams.itemCnt = Math.min(viewList.size(), maxCnt);
+        innerLayoutParams.margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                1, getResources().getDisplayMetrics());
+        int totalMargins = (innerLayoutParams.itemCnt - 1) * innerLayoutParams.margin;
+        innerLayoutParams.itemWidth = (getMeasuredWidth() - getPaddingLeft() - getPaddingRight()
+                - totalMargins) / innerLayoutParams.itemCnt;
+        innerLayoutParams.itemHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+
+//        maxScrollOffset = viewList.size() <= maxCnt ? 0 : (viewList.size() - maxCnt)
+//                * (innerLayoutParams.itemWidth + innerLayoutParams.margin);
+    }
+
+    @Override
+    protected LayoutParams getLayoutParams(int viewIndex) {
+        LayoutParams params = new LayoutParams(innerLayoutParams.itemWidth,
+                innerLayoutParams.itemHeight);
+        if (viewIndex != viewList.size() - 1) {
+            params.rightMargin = innerLayoutParams.margin;
+        }
+        if (viewIndex != 0) {
+            params.addRule(RIGHT_OF, viewList.get(viewIndex - 1).getId());
+        }
+
+        return params;
+    }
+
+    // TODO:
+//    boolean scrollEnabled() {
+//        return maxScrollOffset > 0;
+//    }
+
+    // TODO:
+//    void scrollBy(int x) {
+//        if (getScrollX() + x <= 0) {
+//            scrollTo(0, getScrollY());
+//        } else if (getScrollX() + x >= maxScrollOffset) {
+//            scrollTo(maxScrollOffset, getScrollY());
+//        } else {
+//            scrollBy(x, 0);
+//        }
+//    }
+
+    abstract protected int getMaxItemCntToShow();
+}
+
+abstract class VerticalLayout extends SimpleLayout {
+    public VerticalLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    @Override
+    protected void calculateInnerLayoutParams() {
+        innerLayoutParams.itemCnt = Math.min(viewList.size(), getMaxItemCntToShow());
+        innerLayoutParams.margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                1, getResources().getDisplayMetrics());
+        int totalMargins = (innerLayoutParams.itemCnt - 1) * innerLayoutParams.margin;
+        innerLayoutParams.itemWidth = getMeasuredWidth() - getPaddingLeft() - getPaddingRight();
+        innerLayoutParams.itemHeight = (getMeasuredHeight() - getPaddingTop() - getPaddingBottom()
+                - totalMargins) / innerLayoutParams.itemCnt;
+    }
+
+    @Override
+    protected LayoutParams getLayoutParams(int viewIndex) {
+        LayoutParams params = new LayoutParams(innerLayoutParams.itemWidth,
+                innerLayoutParams.itemHeight);
+        if (viewIndex != viewList.size() - 1) {
+            params.bottomMargin = innerLayoutParams.margin;
+        }
+        if (viewIndex != 0) {
+            params.addRule(BELOW, viewList.get(viewIndex - 1).getId());
+        }
+
+        return params;
+    }
+
+    abstract protected int getMaxItemCntToShow();
+}
+
+class TestSimpleLayout extends VerticalLayout {
+
+    public TestSimpleLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        add(new CategoryBar(context, attrs));
+        add(new CategoryBar(context, attrs));
+        add(new CategoryBar(context, attrs));
+        add(new CategoryBar(context, attrs));
+    }
+
+    @Override
+    protected int getMaxItemCntToShow() {
+        return 2;
+    }
+}
+
+class CategoryBar extends HorizontalLayout {
     public CategoryBar(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -201,24 +316,7 @@ class CategoryBar extends SimpleLayout {
     }
 
     @Override
-    protected LayoutParams getLayoutParams(int viewIndex) {
-        final int maxItemCntToShow = 4;
-        final int itemCnt = Math.min(viewList.size(), maxItemCntToShow);
-
-        final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                1, getResources().getDisplayMetrics());
-        final int itemWidth = (getMeasuredWidth() - getPaddingLeft() - getPaddingRight()
-                - (itemCnt - 1) * margin) / itemCnt;
-        final int itemHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
-
-        LayoutParams params = new LayoutParams(itemWidth, itemHeight);
-        if (viewIndex != viewList.size() - 1) {
-            params.rightMargin = margin;
-        }
-        if (viewIndex != 0) {
-            params.addRule(RIGHT_OF, viewList.get(viewIndex - 1).getId());
-        }
-
-        return params;
+    protected int getMaxItemCntToShow() {
+        return 4;
     }
 }
