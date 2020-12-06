@@ -10,23 +10,32 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 
 public class ListContent extends SimpleLayout {
     private final HorizontalLayout contentContainer;
     private final HorizontalLayout navigationBar;
-
     private final int navigationBarHeight;
+    private ItemView focusItem = null;
+
+    private final HorizontalScrollDetector.HorizontalScrollListener scrollListener =
+            new HorizontalScrollDetector.HorizontalScrollListener() {
+                @Override
+                public void onScroll(int x) {
+                    navigationBar.scrollBy(x);
+                }
+            };
 
     public ListContent(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -44,11 +53,48 @@ public class ListContent extends SimpleLayout {
             protected int getMaxItemCntToShow() {
                 return 1;
             }
+
+            @Override
+            void scrollTo(View view) {
+                int offset = 0;
+                for (int i = 0; i < viewList.size(); i++, offset += itemWidth + margin) {
+                    if (view == viewList.get(i)) {
+                        scrollTo(offset, getScrollY());
+                        break;
+                    }
+                }
+            }
         });
+
         add(navigationBar = new HorizontalLayout(context, attrs) {
+            private int maxScrollOffset;
+
+            @Override
+            protected void calculateInnerLayoutParams() {
+                super.calculateInnerLayoutParams();
+                maxScrollOffset = (itemCnt >= viewList.size()) ? 0 :
+                        (viewList.size() - itemCnt) * (itemWidth + margin);
+            }
+
             @Override
             protected int getMaxItemCntToShow() {
                 return navigationMaxItemToShow;
+            }
+
+            @Override
+            void scrollBy(int x) {
+                if (getScrollX() + x <= 0) {
+                    scrollTo(0, getScrollY());
+                } else if (getScrollX() + x >= maxScrollOffset) {
+                    scrollTo(maxScrollOffset, getScrollY());
+                } else {
+                    scrollBy(x, 0);
+                }
+            }
+
+            @Override
+            boolean scrollEnable() {
+                return maxScrollOffset > 0;
             }
         });
     }
@@ -65,12 +111,16 @@ public class ListContent extends SimpleLayout {
                    @DrawableRes int focusIcon,
                    @DrawableRes int unfocusedIcon,
                    @NonNull View contentView) {
-        ItemView itemView = new ItemView(getContext(), null, title, focusIcon, unfocusedIcon);
+        ItemView itemView = new ItemView(getContext(),
+                title, focusIcon, unfocusedIcon, scrollListener);
         itemView.setTag(contentView);
 
         int viewIndex = contentContainer.add(contentView);
         navigationBar.add(itemView);
 
+        if (viewIndex == 0) {
+            changeFocus(itemView);
+        }
         return viewIndex;
     }
 
@@ -108,7 +158,17 @@ public class ListContent extends SimpleLayout {
         return layoutParams;
     }
 
-    private static class ItemView extends View {
+    private void changeFocus(ItemView view) {
+        if (focusItem != null) {
+            focusItem.setFocus(false);
+        }
+
+        focusItem = view;
+        focusItem.setFocus(true);
+        contentContainer.scrollTo((View)focusItem.getTag());
+    }
+
+    private class ItemView extends View {
         /* ... white space ... 14%
          * ... ICON here   ... 46%
          * ... white space ...  4%
@@ -125,28 +185,48 @@ public class ListContent extends SimpleLayout {
         private final int focusIcon;
         private final int unfocusedIcon;
         private final int focusColor;
-        private final boolean focus = false;
+        private final int backgroundColor;
+        private boolean focus = false;
 
         private final Paint paint = new Paint();
         private final Rect canvasBounds = new Rect();
         private final Rect titleBounds = new Rect();
 
-        public ItemView(Context context,
-                        @Nullable AttributeSet attrs,
-                        @NonNull String title,
-                        @DrawableRes int focusIcon,
-                        @DrawableRes int unfocusedIcon) {
-            super(context, attrs);
+        private final SelectDetector selectDetector = new SelectDetector(this) {
+            @Override
+            void onSelecting() {
+                setBackgroundColor(Color.LTGRAY);
+            }
+
+            @Override
+            void onSelected(boolean selected) {
+                setBackgroundColor(backgroundColor);
+                changeFocus(ItemView.this);
+            }
+        };
+
+        private final HorizontalScrollDetector scrollDetector;
+
+        ItemView(Context context,
+                 @NonNull String title,
+                 @DrawableRes int focusIcon,
+                 @DrawableRes int unfocusedIcon,
+                 @NonNull HorizontalScrollDetector.HorizontalScrollListener listener) {
+            super(context);
 
             this.title = title;
             this.focusIcon = focusIcon;
             this.unfocusedIcon = unfocusedIcon;
             this.focusColor = context.getColor(R.color.focus_color);
+            this.backgroundColor = getDrawingCacheBackgroundColor();
+            this.scrollDetector = new HorizontalScrollDetector(listener);
         }
 
-        public ItemView(Context context, @Nullable AttributeSet attrs) {
-            this(context, attrs,
-                    "原则", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
+        void setFocus(boolean focus) {
+            if (focus != this.focus) {
+                this.focus = focus;
+                invalidate();
+            }
         }
 
         private int getIcon() {
@@ -220,6 +300,18 @@ public class ListContent extends SimpleLayout {
             }
             return number * percentSum / 100;
         }
+
+        @SuppressLint("ClickableViewAccessibility")
+        @Override
+        public boolean onTouchEvent(MotionEvent event) {
+            selectDetector.onTouchEvent(event);
+            if (navigationBar.scrollEnable()) {
+                scrollDetector.onTouchEvent(event);
+            } else {
+                Log.i("SCROLL", "scroll disable");
+            }
+            return true;
+        }
     }
 
     private static abstract class HorizontalLayout extends SimpleLayout {
@@ -228,7 +320,7 @@ public class ListContent extends SimpleLayout {
         protected int itemWidth;
         protected int itemHeight;
 
-        public HorizontalLayout(Context context, AttributeSet attrs) {
+        HorizontalLayout(Context context, AttributeSet attrs) {
             super(context, attrs);
         }
 
@@ -253,7 +345,95 @@ public class ListContent extends SimpleLayout {
             return params;
         }
 
+        void scrollTo(View view) {}
+        void scrollBy(int x) {}
+        boolean scrollEnable() { return false; }
         abstract protected int getMaxItemCntToShow();
+    }
+
+    private static abstract class SelectDetector {
+        private final View view;
+        private boolean press = false;
+
+        SelectDetector(View view) {
+            this.view = view;
+        }
+
+        abstract void onSelecting();
+        abstract void onSelected(boolean selected);
+
+        void onTouchEvent(MotionEvent event) {
+            boolean lastPress = press;
+            if (event.getAction() == MotionEvent.ACTION_DOWN && isInArea(event)) {
+                press = true;
+            }
+            if (event.getAction() == MotionEvent.ACTION_UP || !isInArea(event)) {
+                press = false;
+            }
+
+            if (!lastPress && press) {
+                onSelecting();
+            }
+
+            if (lastPress && !press) {
+                boolean selected = event.getAction() == MotionEvent.ACTION_UP && isInArea(event);
+                onSelected(selected);
+            }
+        }
+
+        private boolean isInArea(MotionEvent event) {
+            float w = view.getWidth();
+            float h = view.getHeight();
+            float x = event.getX(0);
+            float y = event.getY(0);
+            return x >= 0 && x < w && y >= 0 && y <= h;
+        }
+    }
+
+    private static class HorizontalScrollDetector {
+        interface HorizontalScrollListener {
+            void onScroll(int x);
+        }
+
+        private boolean isSet = false;
+        private float startX;
+        private long startEventTime;
+        private final HorizontalScrollListener listener;
+
+        HorizontalScrollDetector(@NonNull HorizontalScrollListener listener) {
+            this.listener = listener;
+        }
+
+        void onTouchEvent(MotionEvent event) {
+            final int SCROLL_PRECISION = 10;
+            final int SCROLL_DURATION = 50;
+
+            boolean lastSet = isSet;
+
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    startX = event.getX(0);
+                    startEventTime = event.getEventTime();
+                    isSet = true;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    isSet = false;
+                    // fall-through
+
+                case MotionEvent.ACTION_MOVE:
+                    if (lastSet) {
+                        float move = startX - event.getX(0);
+                        if ((move >= SCROLL_PRECISION
+                                && event.getEventTime() - startEventTime >= SCROLL_DURATION)
+                                || event.getAction() == MotionEvent.ACTION_UP) {
+                            listener.onScroll((int)move);
+                            startX = event.getX(0);
+                        }
+                    }
+                    break;
+            }
+        }
     }
 }
 
