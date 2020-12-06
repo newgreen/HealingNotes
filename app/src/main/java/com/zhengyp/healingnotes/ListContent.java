@@ -9,11 +9,15 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
 
 public class ListContent {
     ListContent() {
@@ -134,5 +138,87 @@ class ItemView extends View {
             percentSum += percent;
         }
         return number * percentSum / 100;
+    }
+}
+
+abstract class SimpleLayout extends RelativeLayout {
+    protected ArrayList<View> viewList = new ArrayList<>();
+    protected boolean needRefresh = true;
+
+    public SimpleLayout(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
+
+    protected void add(View view) {
+        viewList.add(view);
+        view.setId(viewList.size());
+        refresh();
+    }
+
+    protected void refresh() {
+        needRefresh = true;
+        requestLayout();
+        invalidate();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        measureLayout();
+    }
+
+    protected void measureLayout() {
+        if (needRefresh) {
+            needRefresh = false;
+
+            for (View view : viewList) {
+                removeView(view);
+            }
+
+            for (int i = 0; i < viewList.size(); i++) {
+                addView(viewList.get(i), getLayoutParams(i));
+            }
+        }
+    }
+
+    protected abstract LayoutParams getLayoutParams(int viewIndex);
+}
+
+class CategoryBar extends SimpleLayout {
+    public CategoryBar(Context context, AttributeSet attrs) {
+        super(context, attrs);
+
+        addItem("原则1", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
+        addItem("原则2", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
+        addItem("原则3", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
+        addItem("原则4", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
+        addItem("原则5", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
+        addItem("原则6", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
+    }
+
+    void addItem(String title, int focusIcon, int normalIcon) {
+        add(new ItemView(getContext(), null, title, focusIcon, normalIcon));
+    }
+
+    @Override
+    protected LayoutParams getLayoutParams(int viewIndex) {
+        final int maxItemCntToShow = 4;
+        final int itemCnt = Math.min(viewList.size(), maxItemCntToShow);
+
+        final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
+                1, getResources().getDisplayMetrics());
+        final int itemWidth = (getMeasuredWidth() - getPaddingLeft() - getPaddingRight()
+                - (itemCnt - 1) * margin) / itemCnt;
+        final int itemHeight = getMeasuredHeight() - getPaddingTop() - getPaddingBottom();
+
+        LayoutParams params = new LayoutParams(itemWidth, itemHeight);
+        if (viewIndex != viewList.size() - 1) {
+            params.rightMargin = margin;
+        }
+        if (viewIndex != 0) {
+            params.addRule(RIGHT_OF, viewList.get(viewIndex - 1).getId());
+        }
+
+        return params;
     }
 }
