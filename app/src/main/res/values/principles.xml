@@ -5,6 +5,8 @@
     <dimen name="principleTitleTextSize">18sp</dimen>
     <string name="principleItemIconDesc">show/hide the principle contents</string>
     <string name="principle_title">康复计划的基本原则</string>
+    <string name="principle_menu_fold">折叠</string>
+    <string name="principle_menu_unfold">展开</string>
     <string-array name="principles">
         <item>@array/principle_1</item>
         <item>@array/principle_2</item>

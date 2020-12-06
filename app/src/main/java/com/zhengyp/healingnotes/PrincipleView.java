@@ -19,9 +19,23 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import java.util.ArrayList;
 
 public class PrincipleView extends ListView {
+    private final Adapter adapter;
+
     public PrincipleView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        setAdapter(new Adapter(context));
+        setAdapter(adapter = new Adapter(context));
+    }
+
+    public void redraw(boolean unfold) {
+        for (ItemData data : getDataList(getContext())) {
+            data.showContent = unfold;
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    public void redraw() {
+        // TODO: No data change and not to go to the top
+        adapter.notifyDataSetChanged();
     }
 
     private class Adapter extends ArrayAdapter<ItemData> {
@@ -111,21 +125,25 @@ public class PrincipleView extends ListView {
         }
     }
 
+    private final ArrayList<ItemData> dataList = new ArrayList<>();
+
     @NonNull
     private ArrayList<ItemData> getDataList(@NonNull Context context) {
-        ArrayList<ItemData> dataList = new ArrayList<>();
-        dataList.add(new ItemData(new String[] {""}));
+        if (dataList.size() == 0) {
+            dataList.add(new ItemData(new String[]{""}));
 
-        int principleCnt = context.getResources().getIntArray(R.array.principles).length;
-        TypedArray principleIdList = context.getResources().obtainTypedArray(R.array.principles);
-        for (int i = 0; i < principleCnt; i++) {
-            // substring(1) to remove "@" and remain resourceId
-            int stringArrayResId = Integer.parseInt(principleIdList.getString(i).substring(1));
-            dataList.add(new ItemData(context, stringArrayResId));
+            int principleCnt = context.getResources().getIntArray(R.array.principles).length;
+            TypedArray principleIdList = context.getResources().obtainTypedArray(R.array.principles);
+            for (int i = 0; i < principleCnt; i++) {
+                // substring(1) to remove "@" and remain resourceId
+                int stringArrayResId = Integer.parseInt(principleIdList.getString(i).substring(1));
+                dataList.add(new ItemData(context, stringArrayResId));
+            }
+            principleIdList.recycle();
+
+            dataList.add(new ItemData(new String[]{""}));
         }
-        principleIdList.recycle();
 
-        dataList.add(new ItemData(new String[] {""}));
         return dataList;
     }
 

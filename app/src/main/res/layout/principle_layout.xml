@@ -7,7 +7,7 @@
     android:layout_height="match_parent">
 
     <ImageButton
-        android:id="@+id/imgPrincipleTitle"
+        android:id="@+id/imgPrincipleMenu"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/principleTitleHeight"
         android:backgroundTintMode="screen"
@@ -27,7 +27,7 @@
         android:text="@string/principle_title"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textSize="@dimen/principleTitleTextSize"
-        app:layout_constraintStart_toEndOf="@id/imgPrincipleTitle"
+        app:layout_constraintStart_toEndOf="@id/imgPrincipleMenu"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlSymmetry" />
 
