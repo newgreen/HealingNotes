@@ -9,4 +9,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="unfocused_color">@android:color/darker_gray</color>
     <color name="focus_color">@android:color/holo_green_dark</color>
+    <color name="background">#FFCCCCCC</color>
 </resources>

@@ -97,7 +97,7 @@ public class ListContent extends SimpleLayout {
                 return maxScrollOffset > 0;
             }
         });
-        navigationBar.setBackgroundColor(Color.LTGRAY);
+        navigationBar.setBackgroundColor(context.getColor(R.color.background));
     }
 
     public int add(@NonNull String title,

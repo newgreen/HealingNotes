@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="principleItemHeight">48dp</dimen>
+    <dimen name="principleTitleHeight">60dp</dimen>
+    <dimen name="principleTitleTextSize">18sp</dimen>
     <string name="principleItemIconDesc">show/hide the principle contents</string>
-    <string name="principle_title">principle_title</string>
+    <string name="principle_title">康复计划的基本原则</string>
     <string-array name="principles">
         <item>@array/principle_1</item>
         <item>@array/principle_2</item>

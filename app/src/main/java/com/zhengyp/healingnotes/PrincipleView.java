@@ -54,7 +54,9 @@ public class PrincipleView extends ListView {
         class ViewSet {
             final ConstraintLayout layout;
             final ImageButton icon;
+            final ViewGroup.LayoutParams iconLayoutParams;
             final TextView title;
+            final ViewGroup.LayoutParams titleLayoutParams;
             final TextView content;
             final ViewGroup.LayoutParams contentLayoutParams;
             ItemData data = null;
@@ -73,8 +75,11 @@ public class PrincipleView extends ListView {
                         showData(data);
                     }
                 });
+                iconLayoutParams = icon.getLayoutParams();
 
                 title = layout.findViewById(R.id.txtPrincipleItemTitle);
+                titleLayoutParams = title.getLayoutParams();
+
                 content = layout.findViewById(R.id.txtPrincipleItemContent);
                 contentLayoutParams = content.getLayoutParams();
             }
@@ -83,15 +88,24 @@ public class PrincipleView extends ListView {
                 if (data != null) {
                     this.data = data;
 
-                    icon.setImageResource(data.getIcon());
-                    title.setText(data.title);
-
+                    layout.removeView(icon);
+                    layout.removeView(title);
                     layout.removeView(content);
-                    if (data.showContent && data.content.length() > 0) {
-                        content.setText(data.content);
-                        layout.addView(content, contentLayoutParams);
+
+                    if (!data.title.isEmpty()) {
+                        layout.addView(icon, iconLayoutParams);
+                        layout.addView(title, titleLayoutParams);
+
+                        icon.setImageResource(data.getIcon());
+                        title.setText(data.title);
+
+                        if (data.showContent && data.content.length() > 0) {
+                            content.setText(data.content);
+                            layout.addView(content, contentLayoutParams);
+                        }
                     }
                 }
+
                 return layout;
             }
         }
@@ -100,6 +114,7 @@ public class PrincipleView extends ListView {
     @NonNull
     private ArrayList<ItemData> getDataList(@NonNull Context context) {
         ArrayList<ItemData> dataList = new ArrayList<>();
+        dataList.add(new ItemData(new String[] {""}));
 
         int principleCnt = context.getResources().getIntArray(R.array.principles).length;
         TypedArray principleIdList = context.getResources().obtainTypedArray(R.array.principles);
@@ -110,6 +125,7 @@ public class PrincipleView extends ListView {
         }
         principleIdList.recycle();
 
+        dataList.add(new ItemData(new String[] {""}));
         return dataList;
     }
 
@@ -119,7 +135,10 @@ public class PrincipleView extends ListView {
         boolean showContent = false;
 
         ItemData(@NonNull Context context, int stringArrayResId) {
-            String[] data = context.getResources().getStringArray(stringArrayResId);
+            this(context.getResources().getStringArray(stringArrayResId));
+        }
+
+        ItemData(String[] data) {
             String indentSpace = "　　";
 
             title = data[0];

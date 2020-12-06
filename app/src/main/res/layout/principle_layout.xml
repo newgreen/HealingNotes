@@ -7,39 +7,46 @@
     android:layout_height="match_parent">
 
     <ImageButton
-        android:id="@+id/imgPrincipleItem"
+        android:id="@+id/imgPrincipleTitle"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/principleItemHeight"
+        android:layout_height="@dimen/principleTitleHeight"
         android:backgroundTintMode="screen"
-        android:contentDescription="@string/principleItemIconDesc"
+        android:contentDescription="Hello World!"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_arrow_drop_down" />
+        app:srcCompat="@drawable/ic_menu" />
 
     <TextView
-        android:id="@+id/txtPrincipleItemTitle"
+        android:id="@+id/txtPrincipleTitle"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/principleItemHeight"
+        android:layout_height="@dimen/principleTitleHeight"
+        android:fontFamily="bold"
         android:gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-        android:text="Hello World!"
+        android:text="@string/principle_title"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
-        app:layout_constraintStart_toEndOf="@id/imgPrincipleItem"
+        android:textSize="@dimen/principleTitleTextSize"
+        app:layout_constraintStart_toEndOf="@id/imgPrincipleTitle"
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlSymmetry" />
 
-    <TextView
-        android:id="@+id/txtPrincipleItemContent"
+    <ImageButton
+        android:id="@+id/imgPrincipleHome"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/principleTitleHeight"
+        android:backgroundTintMode="screen"
+        android:contentDescription="Hello World!"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_home" />
+
+    <com.zhengyp.healingnotes.PrincipleView
+        android:id="@+id/principleView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:gravity="center_vertical"
-        android:text="Hello World!"
-        android:textIsSelectable="true"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtPrincipleTitle"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/imgPrincipleItem" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

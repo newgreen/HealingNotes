@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
         ListContent listContent = findViewById(R.id.listContent);
         listContent.add("原则A", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive,
-                new PrincipleView(getApplicationContext(), null));
+                R.layout.principle_layout);
 
         addItem("原则1", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
         addItem("原则2", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
