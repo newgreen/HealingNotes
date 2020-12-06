@@ -2,6 +2,7 @@ package com.zhengyp.healingnotes;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ public class MainActivity extends AppCompatActivity {
                 android.R.layout.simple_list_item_1);
         TextView txtView = listContent.getContentView(ViewIndex);
         txtView.setText("原则1");
+        txtView.setBackgroundColor(Color.LTGRAY);
 
         ViewIndex = listContent.add("原则2",
                 R.drawable.ic_assignment_focus,
