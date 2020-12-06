@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -21,27 +20,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         addPrincipleView();
-
-        ListContent listContent = findViewById(R.id.listContent);
-        listContent.add("原则A", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive,
-                R.layout.principle_layout);
-
-        addItem("原则1", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
-        addItem("原则2", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
-        addItem("原则3", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
-        addItem("原则4", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
-        addItem("原则5", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
-        addItem("原则6", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
-
-        listContent.add("原则Z", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive,
-                new PrincipleView(getApplicationContext(), null));
+        addItem("情绪笔记");
+        // TODO: if comment the below, can not switch to the other view, WHY?
+        addItem("思维笔记");
     }
 
-
-    private void addItem(String title, int focusIcon, int unfocusedIcon) {
+    private void addItem(String title) {
         ListContent listContent = findViewById(R.id.listContent);
-        int ViewIndex = listContent.add(title, focusIcon, unfocusedIcon,
-                android.R.layout.simple_list_item_1);
+        int ViewIndex = listContent.add(title,
+                R.drawable.ic_assignment_focus,
+                R.drawable.ic_assignment,
+                R.layout.simple_item);
         TextView txtView = listContent.getContentView(ViewIndex);
         txtView.setText(title);
         txtView.setBackgroundColor(Color.LTGRAY);

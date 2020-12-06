@@ -118,6 +118,13 @@ public class PrincipleView extends ListView {
                             layout.addView(content, contentLayoutParams);
                         }
                     }
+
+                    if (data.isLastItem) {
+                        // TODO: why the ListView is covered by the navigationBar
+                        // here just add an extra item to avoid the problem
+                        layout.addView(title, titleLayoutParams);
+                        title.setText("");
+                    }
                 }
 
                 return layout;
@@ -130,7 +137,7 @@ public class PrincipleView extends ListView {
     @NonNull
     private ArrayList<ItemData> getDataList(@NonNull Context context) {
         if (dataList.size() == 0) {
-            dataList.add(new ItemData(new String[]{""}));
+            dataList.add(new ItemData(new String[]{""}, false));
 
             int principleCnt = context.getResources().getIntArray(R.array.principles).length;
             TypedArray principleIdList = context.getResources().obtainTypedArray(R.array.principles);
@@ -141,7 +148,7 @@ public class PrincipleView extends ListView {
             }
             principleIdList.recycle();
 
-            dataList.add(new ItemData(new String[]{""}));
+            dataList.add(new ItemData(new String[]{""}, true));
         }
 
         return dataList;
@@ -150,15 +157,17 @@ public class PrincipleView extends ListView {
     private static class ItemData {
         final String title;
         final StringBuilder content = new StringBuilder();
+        final boolean isLastItem;
         boolean showContent = false;
 
         ItemData(@NonNull Context context, int stringArrayResId) {
-            this(context.getResources().getStringArray(stringArrayResId));
+            this(context.getResources().getStringArray(stringArrayResId), false);
         }
 
-        ItemData(String[] data) {
+        ItemData(String[] data, boolean isLastItem) {
             String indentSpace = "　　";
 
+            this.isLastItem = isLastItem;
             title = data[0];
             for (int i = 1; i < data.length; i++) {
                 content.append(indentSpace).append(data[i]).append("\n");
