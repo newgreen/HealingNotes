@@ -12,12 +12,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListContent listContent = findViewById(R.id.listContent);
+        listContent.add("原则A", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive,
+                new PrincipleView(getApplicationContext(), null));
+
         addItem("原则1", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
         addItem("原则2", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
         addItem("原则3", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
         addItem("原则4", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
         addItem("原则5", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive);
         addItem("原则6", R.drawable.ic_assignment_focus, R.drawable.ic_assignment);
+
+        listContent.add("原则Z", R.drawable.ic_all_inclusive_focus, R.drawable.ic_all_inclusive,
+                new PrincipleView(getApplicationContext(), null));
     }
 
     private void addItem(String title, int focusIcon, int unfocusedIcon) {
