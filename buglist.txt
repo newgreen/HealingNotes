@@ -1,5 +1,5 @@
 [bugList]
-[  ] bug-1: HOME按钮无法回到顶部
+[ok] bug-1: HOME按钮无法回到顶部
 [  ] bug-2: ListView无法全部显示，底部内容可能被导航栏遮挡
 [  ] bug-3: 只有2个item的时候，contentView切换异常
 [ok] bug-4: 拖动离开item区域，但是对应item却被选中

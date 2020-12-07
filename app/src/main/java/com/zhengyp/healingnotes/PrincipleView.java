@@ -34,8 +34,10 @@ public class PrincipleView extends ListView {
     }
 
     public void redraw() {
-        // TODO: No data change and not to go to the top
+        // access the website for more information:
+        // https://stackoverflow.com/questions/12491855/android-listview-scrollto-doesnt-work
         adapter.notifyDataSetChanged();
+        setSelection(0);
     }
 
     private class Adapter extends ArrayAdapter<ItemData> {
