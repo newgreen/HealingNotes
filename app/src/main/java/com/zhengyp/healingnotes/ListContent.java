@@ -159,7 +159,11 @@ public class ListContent extends SimpleLayout {
         return layoutParams;
     }
 
-    private void changeFocus(ItemView view) {
+    private void changeFocus(@NonNull ItemView view) {
+        if (focusItem == view) {
+            return;
+        }
+
         if (focusItem != null) {
             focusItem.setFocus(false);
         }
@@ -196,13 +200,15 @@ public class ListContent extends SimpleLayout {
         private final SelectDetector selectDetector = new SelectDetector(this) {
             @Override
             void onSelecting() {
-                setBackgroundColor(Color.LTGRAY);
+                setBackgroundColor(getContext().getColor(R.color.selecting));
             }
 
             @Override
             void onSelected(boolean selected) {
                 setBackgroundColor(backgroundColor);
-                changeFocus(ItemView.this);
+                if (selected) {
+                    changeFocus(ItemView.this);
+                }
             }
         };
 

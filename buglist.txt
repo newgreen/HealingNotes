@@ -1,0 +1,7 @@
+[bugList]
+[  ] bug-1: HOME按钮无法回到顶部
+[  ] bug-2: ListView无法全部显示，底部内容可能被导航栏遮挡
+[  ] bug-3: 只有2个item的时候，contentView切换异常
+[ok] bug-4: 拖动离开item区域，但是对应item却被选中
+[  ] bug-5: 各个部分调色问题, 例如选中的item的颜色跟背景色相同, 看不出选中效果
+[  ] bug-6: 各个组件之间的margin太宽
