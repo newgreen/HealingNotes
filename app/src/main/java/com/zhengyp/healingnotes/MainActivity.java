@@ -5,12 +5,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.ActionMode;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,76 +39,27 @@ public class MainActivity extends AppCompatActivity {
                                         R.drawable.ic_all_inclusive,
                                         R.layout.principle_layout);
         ConstraintLayout layout = listContent.getContentView(itemIndex);
-
-        principleView = layout.findViewById(R.id.principleView);
+        final PrincipleView principleView = layout.findViewById(R.id.principleView);
 
         ImageButton imgPrincipleMenu = layout.findViewById(R.id.imgPrincipleMenu);
-        imgPrincipleMenu.setOnLongClickListener(this::onPrincipleMenuClick);
-        imgPrincipleMenu.setOnClickListener(this::onPrincipleMenuClick);
+        imgPrincipleMenu.setOnClickListener(view -> {
+            PopupMenu popup = new PopupMenu(this, view);
+            popup.setOnMenuItemClickListener(menuItem -> {
+                if (menuItem.getItemId() == R.id.principle_menu_fold) {
+                    principleView.redraw(false);
+                    return true;
+                } else if (menuItem.getItemId() == R.id.principle_menu_unfold) {
+                    principleView.redraw(true);
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+            popup.inflate(R.menu.principle_menu);
+            popup.show();
+        });
 
         ImageButton imgPrincipleHome = layout.findViewById(R.id.imgPrincipleHome);
-        imgPrincipleHome.setOnLongClickListener(this::redrawPrincipleView);
-        imgPrincipleHome.setOnClickListener(this::redrawPrincipleView);
+        imgPrincipleHome.setOnClickListener(view -> principleView.redraw());
     }
-
-    private boolean onPrincipleMenuClick(View view) {
-        if (actionMode != null) {
-            return false;
-        }
-
-        actionMode = startActionMode(actionModeCallback);
-        view.setSelected(true);
-        return true;
-    }
-
-    private boolean redrawPrincipleView(View view) {
-        if (principleView != null) {
-            principleView.redraw();
-        }
-
-        view.setSelected(true);
-        return true;
-    }
-
-    private void redrawPrincipleView(boolean unfold) {
-        if (principleView != null) {
-            principleView.redraw(unfold);
-        }
-    }
-
-    // Access the website for more information:
-    // https://developer.android.com/guide/topics/ui/menus?hl=zh-cn#CAB
-    PrincipleView principleView = null;
-    ActionMode actionMode = null;
-    ActionMode.Callback actionModeCallback = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.principle_menu, menu);
-            return true;
-        }
-
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false; // Return false if nothing is done
-        }
-
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.principle_menu_fold) {
-                redrawPrincipleView(false);
-                return true;
-            } else if (item.getItemId() == R.id.principle_menu_unfold) {
-                redrawPrincipleView(true);
-                return true;
-            } else {
-                return false;
-            }
-        }
-
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
-        }
-    };
 }
