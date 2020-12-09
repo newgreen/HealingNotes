@@ -25,8 +25,8 @@ public class MainView {
     }
 
     public int addItem(String title, int focusIcon, int unfocusedIcon, int layoutResId) {
-        return addItem(title, focusIcon, unfocusedIcon,
-                LayoutInflater.from(mainView.getContext()).inflate(layoutResId, null));
+        View newLayout = LayoutInflater.from(mainView.getContext()).inflate(layoutResId, null);
+        return addItem(title, focusIcon, unfocusedIcon, newLayout);
     }
 
     public int addItem(String title, int focusIcon, int unfocusedIcon, View view) {
@@ -46,11 +46,11 @@ public class MainView {
     public <T extends View> T getContentViewByItemIndex(int itemIndex) {
         View view = navigationBar.getItem(itemIndex);
         //noinspection unchecked
-        return (view != null) ? (T)view.getTag() : null;
+        return (view != null) ? (T) view.getTag() : null;
     }
 
     private void changeFocus(View view) {
-        NavigationBarItem item = (NavigationBarItem)view;
+        NavigationBarItem item = (NavigationBarItem) view;
         if (focusItem != item) {
             missFocus(focusItem);
             onFocus(item);
@@ -59,12 +59,12 @@ public class MainView {
 
     private void missFocus(NavigationBarItem item) {
         item.setFocus(false);
-        mainView.removeView((View)item.getTag());
+        mainView.removeView((View) item.getTag());
     }
 
     private void onFocus(NavigationBarItem item) {
         focusItem = item;
         item.setFocus(true);
-        mainView.addView((View)item.getTag(), contentLayoutParams);
+        mainView.addView((View) item.getTag(), contentLayoutParams);
     }
 }

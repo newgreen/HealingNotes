@@ -56,12 +56,15 @@ public class NavigationBar extends HorizontalScrollView {
     }
 
     private void measureLayout() {
-        final int MAX_ITEM_TO_SHOW = 4;
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                getMeasuredWidth() / MAX_ITEM_TO_SHOW, getMeasuredHeight());
+        if (viewList.size() > 0) {
+            final int MAX_ITEM_TO_SHOW = 4;
+            int itemCnt = Math.min(viewList.size(), MAX_ITEM_TO_SHOW);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    getMeasuredWidth() / itemCnt, getMeasuredHeight());
 
-        for (View view : viewList) {
-            linearLayout.addView(view, layoutParams);
+            for (View view : viewList) {
+                linearLayout.addView(view, layoutParams);
+            }
         }
     }
 
