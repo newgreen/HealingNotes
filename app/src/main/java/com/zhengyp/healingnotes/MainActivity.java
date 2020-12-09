@@ -18,7 +18,8 @@ public class MainActivity extends AppCompatActivity {
 
         mainView = new MainView(findViewById(R.id.mainView));
         addPrincipleView();
-        initNavigationBarDefaultItems(mainView);
+        addMoonNotesView();
+        addThinkingNotesView();
     }
 
     private void addPrincipleView() {
@@ -51,15 +52,16 @@ public class MainActivity extends AppCompatActivity {
         imgPrincipleHome.setOnClickListener(view -> principleView.goToTop());
     }
 
-    private void initNavigationBarDefaultItems(MainView mainView) {
-        addNavigationItem(mainView, "情绪笔记");
-        addNavigationItem(mainView, "思维笔记");
+    private void addMoonNotesView() {
+        mainView.addItem("情绪笔记",
+                R.drawable.ic_assignment_focus, R.drawable.ic_assignment,
+                R.layout.moon_notes_layout);
     }
 
-    private void addNavigationItem(MainView mainView, String title) {
-        int itemIndex = mainView.addItem(title,
+    private void addThinkingNotesView() {
+        int itemIndex = mainView.addItem("思维笔记",
                 R.drawable.ic_assignment_focus, R.drawable.ic_assignment, R.layout.simple_item);
         TextView textView = mainView.getContentViewByItemIndex(itemIndex);
-        textView.setText(title);
+        textView.setText("思维笔记");
     }
 }

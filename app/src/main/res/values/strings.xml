@@ -1,4 +1,10 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">康复笔记</string>
     <string name="say_hello">康复笔记</string>
+    <string name="moon_notes_title">情绪笔记</string>
+    <string name="moon_change_format"><![CDATA[正常 => 伤心]]></string>
+    <string name="date_format" tools:ignore="TypographyDashes">2020-12-09 18:30</string>
+    <string name="moonNotesInnerContent">内部因素</string>
+    <string name="moonNotesOuterContent">外部因素</string>
+    <string name="moon_change">情绪变化</string>
 </resources>
