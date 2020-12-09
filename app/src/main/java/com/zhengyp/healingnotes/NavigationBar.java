@@ -28,9 +28,14 @@ public class NavigationBar extends HorizontalScrollView {
         this(context, null);
     }
 
-    public void addItem(View view) {
+    public int addItem(View view) {
         viewList.add(view);
         refresh();
+        return viewList.size() - 1;
+    }
+
+    public View getItem(int itemIndex) {
+        return viewList.get(itemIndex);
     }
 
     @Override
